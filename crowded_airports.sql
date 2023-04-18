@@ -2,16 +2,16 @@ SET sql_safe_updates = 0;
 
 CREATE database crowded_airports;
 
-use crowded_airports;
+USE crowded_airports;
 
-create table airports (
-	airport_rank int, 
-    airport varchar(50), 
-    location varchar(50), 
-    country varchar(50), 
-    code varchar(20), 
-    passengers int, 
-    year int
+CREATE TABLE airports (
+	airport_rank INT, 
+    airport VARCHAR(50), 
+    location VARCHAR(50), 
+    country VARCHAR(50), 
+    code VARCHAR(20), 
+    passengers INT, 
+    year INT
 );
 
 LOAD DATA LOCAL INFILE '/Users/tonykim/Downloads/Airports.csv'
@@ -23,38 +23,38 @@ IGNORE 1 ROWS;
 
 
 
-select *, count(country) over (partition by country) as country_count 
-from airports
-where year = 2020
-order by country_count desc; 
+SELECT *, COUNT(country) OVER (PARTITION BY country) AS country_count 
+FROM airports
+WHERE year = 2020
+ORDER BY country_count DESC; 
 
 -- shows number of most crowded airports in each country
-select country, count(country) as country_count
-from airports
-where year = 2020
-group by country
-order by country_count desc;
+SELECT country, COUNT(country) AS country_count
+FROM airports
+WHERE year = 2020
+GROUP BY country
+ORDER BY country_count DESC;
 
 -- shows most crowded airports in the US
-select *
-from airports 
-where country like 'united states%'
-and year = 2020
-order by passengers desc; 
+SELECT *
+FROM airports 
+WHERE country LIKE 'united states%'
+AND year = 2020
+ORDER BY passengers DESC; 
 
 -- show the states where the US airports are located in
-alter table airports
-add state varchar(20); 
+ALTER TABLE airports
+ADD state VARCHAR(20); 
 
-update airports
-set state = substring_index(location, ',', -1);
+UPDATE airports
+SET state = substring_index(location, ',', -1);
 
 -- show airport codes in a modified way
-alter table airports
-add airport_code varchar(5);
+ALTER TABLE airports
+ADD airport_code VARCHAR(5);
 
-update airports
-set airport_code = substring(code, 1, 3); 
+UPDATE airports
+SET airport_code = substring(code, 1, 3); 
 
 
 
