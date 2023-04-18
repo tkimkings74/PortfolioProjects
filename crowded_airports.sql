@@ -59,37 +59,37 @@ set airport_code = substring(code, 1, 3);
 
 
 -- show change in passengers in each U.S. airport by year
-select airport, location, country, code, passengers, year 
-from airports
-where country = 'United States' 
-order by 1,2,3,4,6;
+SELECT airport, location, country, code, passengers, year 
+FROM airports
+WHERE country = 'United States' 
+ORDER BY 1,2,3,4,6;
 
 
 
 
 
 -- show the cities where US airports are located in
-alter table airports
-add city varchar(50); 
+ALTER TABLE  airports
+ADD city varchar(50); 
 
-update airports
-set city = substring_index(location, ',', 1);
+UPDATE airports
+SET city = substring_index(location, ',', 1);
 
-select airport, location, country, code, passengers, year, sum(passengers) over (partition by year)
-from airports
-where country = 'United States' 
-group by 
+SELECT airport, location, country, code, passengers, year, sum(passengers) OVER (PARTITION BY year)
+FROM airports
+WHERE country = 'United States' 
+GROUP BY
  airport, location, country, code, passengers, year;
  
 
 
 -- show change in total passengers in all of the crowded airports in US
-select year, sum(passengers) as total_passengers
-from airports
-where country = 'united states' 
-group by year
-order by year;
+SELECT year, sum(passengers) AS total_passengers
+FROM airports
+WHERE country = 'united states' 
+GROUP BY year
+ORDER BY year;
 
-select * 
-from airports 
-where year = 2020; 
+SELECT * 
+FROM airports 
+WHERE year = 2020; 
