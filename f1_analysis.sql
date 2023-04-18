@@ -1,47 +1,47 @@
 SET SQL_SAFE_UPDATES = 0;
 
-use formula1db;
+USE formula1db;
 
 
-create table practice1 (
-	pos int, 
-    driver_num int, 
-    driver varchar(20), 
-    car varchar(30), 
-    time varchar(20), 
-    gap varchar(20), 
-    laps int
+CREATE TABLE practice1 (
+	pos INT, 
+    driver_num INT, 
+    driver VARCHAR(20), 
+    car VARCHAR(30), 
+    time VARCHAR(20), 
+    gap VARCHAR(20), 
+    laps INT
 );
 
-create table practice2 (
-	pos int, 
-    driver_num int, 
-    driver varchar(20), 
-    car varchar(30), 
-    time varchar(20), 
-    gap varchar(20), 
-    laps int
+CREATE TABLE practice2 (
+	pos INT, 
+    driver_num INT, 
+    driver VARCHAR(20), 
+    car VARCHAR(30), 
+    time VARCHAR(20), 
+    gap VARCHAR(20), 
+    laps INT
 );
 
-create table practice3 (
-	pos int, 
-    driver_num int, 
-    driver varchar(20), 
-    car varchar(30), 
-    time varchar(20), 
-    gap varchar(20), 
-    laps int
+CREATE TABLE practice3 (
+	pos INT, 
+    driver_num INT, 
+    driver VARCHAR(20), 
+    car VARCHAR(30), 
+    time VARCHAR(20), 
+    gap VARCHAR(20), 
+    laps INT
 );
 
-create table qualifying (
-	pos int, 
-    driver_num int, 
-    driver varchar(20), 
-    car varchar(30), 
-    q1 varchar(20), 
-	q2 varchar(20), 
-	q3 varchar(20), 
-    laps int
+CREATE TABLE qualifying (
+	pos INT, 
+    driver_num INT, 
+    driver VARCHAR(20), 
+    car VARCHAR(30), 
+    q1 VARCHAR(20), 
+	q2 VARCHAR(20), 
+	q3 VARCHAR(20), 
+    laps INT
 );
 
 
@@ -69,276 +69,277 @@ IGNORE 1 ROWS;
 
 
 -- practice1 conversion 
-alter table practice1 
-add minute_to_second double; 
+ALTER TABLE practice1 
+ADD minute_to_second DOUBLE; 
 
-update practice1 
-set minute_to_second = convert(substring_index(time, ':', 1 ), double) * 60;
+UPDATE practice1 
+SET minute_to_second = convert(substring_index(time, ':', 1 ), DOUBLE) * 60;
 
 
 
-alter table practice1
-add second_to_second double; 
+ALTER TABLE practice1
+ADD second_to_second DOUBLE; 
 
-update practice1 
-set second_to_second = convert(substring_index(time, ':', -1 ), double); 
+UPDATE practice1 
+SET second_to_second = convert(substring_index(time, ':', -1 ), DOUBLE); 
 
-alter table practice1 
-add time_in_seconds double; 
+ALTER TABLE practice1 
+ADD time_in_seconds DOUBLE; 
 
-update practice1 
-set time_in_seconds = minute_to_second + second_to_second; 
+UPDATE practice1 
+SET time_in_seconds = minute_to_second + second_to_second; 
 
-update practice1 
-set driver = substring(driver, length(driver) - 3, length(driver)); 
+UPDATE practice1 
+SET driver = substring(driver, length(driver) - 3, length(driver)); 
 
 
 -- practice2 conversion
-alter table practice2 
-add minute_to_second double; 
+ALTER TABLE practice2 
+ALTER minute_to_second double; 
 
-update practice2 
-set minute_to_second = convert(substring_index(time, ':', 1 ), double) * 60;
+UPDATE practice2 
+SET minute_to_second = convert(substring_index(time, ':', 1 ), double) * 60;
 
 
 
-alter table practice2
+ALTER TABLE practice2
 add second_to_second double; 
 
-update practice2 
-set second_to_second = convert(substring_index(time, ':', -1 ), double); 
+UPDATE practice2 
+SET second_to_second = convert(substring_index(time, ':', -1 ), double); 
 
-alter table practice2 
+ALTER TABLE practice2 
 add time_in_seconds double; 
 
-update practice2 
-set time_in_seconds = minute_to_second + second_to_second; 
+UPDATE practice2 
+SET time_in_seconds = minute_to_second + second_to_second; 
 
-update practice2
-set driver = substring(driver, length(driver) - 3, length(driver)); 
+UPDATE practice2
+SET driver = substring(driver, length(driver) - 3, length(driver)); 
 
 
 -- practice3 conversion
-alter table practice3
-add minute_to_second double; 
+ALTER TABLE practice3
+ADD minute_to_second double; 
 
-update practice3
-set minute_to_second = convert(substring_index(time, ':', 1 ), double) * 60;
+UPDATE practice3
+SET minute_to_second = convert(substring_index(time, ':', 1 ), double) * 60;
 
 
 
-alter table practice3
-add second_to_second double; 
+ALTER TABLE practice3
+ADD second_to_second double; 
 
-update practice3
-set second_to_second = convert(substring_index(time, ':', -1 ), double); 
+UPDATE practice3
+SET second_to_second = convert(substring_index(time, ':', -1 ), double); 
 
-alter table practice3
+ALTER TABLE practice3
 add time_in_seconds double; 
 
-update practice3
-set time_in_seconds = minute_to_second + second_to_second; 
+UPDATE practice3
+SET time_in_seconds = minute_to_second + second_to_second; 
 
-select * from practice1 
-union select * from practice2 
-union select * from practice3
+SELECT * FROM practice1 
+UNION 
+SELECT * FROM practice2 
+UNION 
+SELECT * FROM practice3
 ; 
 
-update practice3 
-set driver = substring(driver, length(driver) - 3, length(driver)); 
+UPDATE practice3 
+SET driver = substring(driver, length(driver) - 3, length(driver)); 
 
 
 -- ranks drivers in order based on performance during practice
-with cte as (
-	select * from practice1 
-	union select * from practice2 
-	union select * from practice3
+WITH cte AS (
+	SELECT * FROM practice1 
+	UNION SELECT * FROM practice2 
+	UNION SELECT * FROM practice3
 
-) select driver, avg(time_in_seconds) as pace
-from cte 
-group by driver
-order by pace asc; 
+) SELECT driver, avg(time_in_seconds) AS pace
+FROM cte 
+GROUP BY driver
+ORDER BY pace ASC; 
 
 
 
 -- converting time to seconds in qualifying session 
+ALTER TABLE qualifying
+ADD q1_updated varchar(30); 
 
-alter table qualifying
-add q1_updated varchar(30); 
+ALTER TABLE qualifying
+ADD q2_updated varchar(30); 
 
-alter table qualifying
-add q2_updated varchar(30); 
-
-alter table qualifying
-add q3_updated varchar(30); 
-
-
-alter table qualifying
-add q1_min double; 
-
-alter table qualifying 
-add q1_sec double; 
-
-alter table qualifying
-add q2_min double; 
-
-alter table qualifying 
-add q2_sec double; 
-
-alter table qualifying
-add q3_min double; 
-
-alter table qualifying 
-add q3_sec double; 
-
-alter table qualifying 
-add q1_in_seconds double;
-
-alter table qualifying 
-add q2_in_seconds double;
-
-alter table qualifying 
-add q3_in_seconds double; 
+ALTER TABLE qualifying
+ADD q3_updated varchar(30); 
 
 
-update qualifying
-set q1_updated = q1; 
+ALTER TABLE qualifying
+ADD q1_min double; 
 
-update qualifying
-set q2_updated = 
-case 
-	when q2 = 'DNF' then q1
-    when q2 = '' then q1 
-    else q2
-    end;
+ALTER TABLE qualifying 
+ADD q1_sec double; 
+
+ALTER TABLE qualifying
+ADD q2_min double; 
+
+ALTER TABLE qualifying 
+ADD q2_sec double; 
+
+ALTER TABLE qualifying
+ADD q3_min double; 
+
+ALTER TABLE qualifying 
+ADD q3_sec double; 
+
+ALTER TABLE qualifying 
+ADD q1_in_seconds double;
+
+ALTER TABLE qualifying 
+ADD q2_in_seconds double;
+
+ALTER TABLE qualifying 
+ADD q3_in_seconds double; 
+
+
+UPDATE qualifying
+SET q1_updated = q1; 
+
+UPDATE qualifying
+SET q2_updated = 
+CASE 
+	WHEN q2 = 'DNF' THEN q1
+	WHEN q2 = '' THEN q1 
+	ELSE q2
+	END;
     
     
-update qualifying
-set q3_updated = 
-case 
-	when q3 = 'DNF' then q2_updated
-    when q3 = '' then q2_updated
-    else q3
-    end;
+UPDATE qualifying
+SET q3_updated = 
+CASE 
+	WHEN q3 = 'DNF' THEN q2_updated
+	WHEN q3 = '' THEN q2_updated
+	ELSE q3
+	END;
     
-update qualifying 
-set q1_min = convert(substring_index(q1_updated, ':', 1 ), double) * 60;
+UPDATE qualifying 
+SET q1_min = convert(substring_index(q1_updated, ':', 1 ), double) * 60;
 
-update qualifying 
-set q1_sec = convert(substring_index(q1_updated, ':', -1 ), double);
+UPDATE qualifying 
+SET q1_sec = convert(substring_index(q1_updated, ':', -1 ), double);
 
-update qualifying 
-set q2_min = convert(substring_index(q2_updated, ':', 1 ), double) * 60;
+UPDATE qualifying 
+SET q2_min = convert(substring_index(q2_updated, ':', 1 ), double) * 60;
 
-update qualifying 
-set q2_sec = convert(substring_index(q2_updated, ':', -1 ), double);
+UPDATE qualifying 
+SET q2_sec = convert(substring_index(q2_updated, ':', -1 ), double);
 
-update qualifying 
-set q3_min = convert(substring_index(q3_updated, ':', 1 ), double) * 60;
+UPDATE qualifying 
+SET q3_min = convert(substring_index(q3_updated, ':', 1 ), double) * 60;
 
-update qualifying 
-set q3_sec = convert(substring_index(q3_updated, ':', -1 ), double);
+UPDATE qualifying 
+SET q3_sec = convert(substring_index(q3_updated, ':', -1 ), double);
 
 
-update qualifying
-set q1_in_seconds = q1_min + q1_sec; 
+UPDATE qualifying
+SET q1_in_seconds = q1_min + q1_sec; 
 
-update qualifying
-set q2_in_seconds = q2_min + q2_sec; 
+UPDATE qualifying
+SET q2_in_seconds = q2_min + q2_sec; 
 
-update qualifying
-set q3_in_seconds = q3_min + q3_sec; 
+UPDATE qualifying
+SET q3_in_seconds = q3_min + q3_sec; 
 
-alter table qualifying
-add time_in_seconds double; 
+ALTER TABLE qualifying
+ADD time_in_seconds double; 
 
-update qualifying
-set time_in_seconds = (q1_in_seconds + q2_in_seconds + q3_in_seconds)/3 ;
+UPDATE qualifying
+SET time_in_seconds = (q1_in_seconds + q2_in_seconds + q3_in_seconds)/3 ;
 
 -- drop unnecessary columns to create a combined table 
 
-alter table practice1 
-	drop column time,
-	drop column gap,
-	drop column minute_to_second, 
-	drop column second_to_second; 
+ALTER TABLE practice1 
+	DROP column time,
+	DROP column gap,
+	DROP column minute_to_second, 
+	DROP column second_to_second; 
 
-alter table practice2
-	drop column time,
-	drop column gap,
-	drop column minute_to_second, 
-	drop column second_to_second; 
+ALTER TABLE practice2
+	DROP column time,
+	DROP column gap,
+	DROP column minute_to_second, 
+	DROP column second_to_second; 
 
-alter table practice3 
-	drop column time,
-	drop column gap,
-	drop column minute_to_second, 
-	drop column second_to_second; 
+ALTER TABLE practice3 
+	DROP column time,
+	DROP column gap,
+	DROP column minute_to_second, 
+	DROP column second_to_second; 
 
-select * from qualifying;
+SELECT * FROM qualifying;
 
-alter table qualifying
-	drop column q1, 
-    drop column q2, 
-    drop column q3, 
-    drop column q1_updated, 
-    drop column q2_updated, 
-    drop column q3_updated, 
-    drop column q1_min, 
-    drop column q1_sec, 
-    drop column q2_min, 
-    drop column q2_sec, 
-    drop column q3_min, 
-    drop column q3_sec, 
-    drop column q1_in_seconds, 
-    drop column q2_in_seconds, 
-    drop column q3_in_seconds; 
+ALTER TABLE qualifying
+    DROP column q1, 
+    DROP column q2, 
+    DROP column q3, 
+    DROP column q1_updated, 
+    DROP column q2_updated, 
+    DROP column q3_updated, 
+    DROP column q1_min, 
+    DROP column q1_sec, 
+    DROP column q2_min, 
+    DROP column q2_sec, 
+    DROP column q3_min, 
+    DROP column q3_sec, 
+    DROP column q1_in_seconds, 
+    DROP column q2_in_seconds, 
+    DROP column q3_in_seconds; 
 	
 -- ranks drivers based on performance from all practice and qualifying sessions
-with pacecte as (
-	select * from practice1 union
-    select * from practice2 union
-    select * from practice3 union 
-    select * from qualifying
-) select driver, car, avg(time_in_seconds) as pace, avg(laps) as laps, avg(pos) as avg_pos
-from pacecte
-group by driver, car
-order by avg_pos ; 
+WITH pacecte AS (
+	SELECT * FROM practice1 UNION
+    SELECT * FROM practice2 UNION
+    SELECT * FROM practice3 UNION 
+    SELECT * FROM qualifying
+) SELECT driver, car, avg(time_in_seconds) AS pace, avg(laps) AS laps, avg(pos) AS avg_pos
+FROM pacecte
+GROUP BY driver, car
+ORDER BY avg_pos ; 
 
-create table pace_prediction (
-	driver varchar(30), 
+CREATE TABLE pace_prediction (
+    driver varchar(30), 
     car varchar(30), 
     pace double, 
     laps double, 
     avg_pos double
 );
 
-with pacecte as (
-	select * from practice1 union
-    select * from practice2 union
-    select * from practice3 union 
-    select * from qualifying
+with pacecte AS (
+	SELECT * FROM practice1 UNION
+    SELECT * FROM practice2 UNION
+    SELECT * FROM practice3 UNION 
+    SELECT * FROM qualifying
 ) 
-update pace_prediction 
-set driver = 
+UPDATE pace_prediction 
+SET driver = 
 pacecte.driver;
 
 
-update qualifying 
-set driver = substring(driver, length(driver) - 3, length(driver)); 
+UPDATE qualifying 
+SET driver = substring(driver, length(driver) - 3, length(driver)); 
 
-create table pace_prediction as 
-with pacecte as (
-	select * from practice1 union
-    select * from practice2 union
-    select * from practice3 union 
-    select * from qualifying
-) select driver, car, avg(time_in_seconds) as pace, avg(laps) as laps, avg(pos) as avg_pos
-from pacecte
-group by driver, car
-order by avg_pos;
+CREATE TABLE pace_prediction AS 
+with pacecte AS (
+	SELECT * FROM practice1 UNION
+    SELECT * FROM practice2 UNION
+    SELECT * FROM practice3 UNION 
+    SELECT * FROM qualifying
+) SELECT driver, car, avg(time_in_seconds) AS pace, avg(laps) AS laps, avg(pos) AS avg_pos
+FROM pacecte
+GROUP BY driver, car
+ORDER BY avg_pos;
 
-select * from pace_prediction;
+SELECT * FROM pace_prediction;
 
 
 
