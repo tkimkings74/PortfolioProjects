@@ -1,10 +1,11 @@
-set sql_safe_updates = 0; 
+SET sql_safe_updates = 0; 
 
-create database exploring_wealth; 
+CREATE database exploring_wealth; 
 
-use exploring_wealth;
-create table richest_people(
-	weatlh_rank int, 
+USE exploring_wealth;
+
+CREATE TABLE richest_people(
+    weatlh_rank int, 
     name varchar(50), 
     net_worth varchar(20), 
     age int, 
@@ -23,110 +24,110 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
 IGNORE 1 ROWS;
 
-select * from richest_people; 
+SELECT * FROM richest_people; 
 
 
 -- networth is saved as a string containing $ sign and the letter B. remove these and save as int
-update richest_people 
-set net_worth = substring(net_worth, 1, position('B' in net_worth) -1);
+UPDATE richest_people 
+SET net_worth = substring(net_worth, 1, position('B' IN net_worth) -1);
 
-alter table richest_people 
+ALTER TABLE richest_people 
 rename column net_worth to networth_b;
 
 
 -- delete blank rows from data table
-select * from richest_people where networth_b = ''; 
+SELECT * FROM richest_people WHERE networth_b = ''; 
 
-delete from richest_people
-where networth_b = ''; 
+DELETE FROM richest_people
+WHERE networth_b = ''; 
 
-alter table richest_people 
+ALTER TABLE richest_people 
 modify networth_b int; 
 
 
 
 -- some records are missing value for age. set these to null 
-update richest_people 
-set age = null 
-where age = 0; 
+UPDATE richest_people 
+SET age = null 
+WHERE age = 0; 
 
 
-alter table richest_people
+ALTER TABLE richest_people
 add second_source varchar(50);
 
 
-update richest_people
-set second_source = 
-case 
-	when position(',' in source) != 0 then substring_index(source, ',', -1)
-    else null 
-    end; 
+UPDATE richest_people
+SET second_source = 
+CASE 
+	WHEN position(',' in source) != 0 THEN substring_index(source, ',', -1)
+	ELSE NULL 
+	END; 
     
-update richest_people 
-set source = 
-case 
-	when position(',' in source) != 0 then substring_index(source, ',', 1)
-    else source
-    end;
+UPDATE richest_people 
+SET source = 
+CASE 
+	WHEN position(',' in source) != 0 THEN substring_index(source, ',', 1)
+	ELSE source
+	END;
     
 
 
 -- create separate table for people with multiple sources of income
-create table people_with_second_source as 
-with cte as (
-select * from richest_people
-where second_source is not null
-) select * from cte; 
+CREATE TABLE people_with_second_source AS 
+with cte AS (
+SELECT * FROM richest_people
+WHERE second_source IS NOT NULL
+) SELECT * FROM cte; 
 
 
 -- compare average networth of those with multiple sources of income compared to those with single source
-select avg(networth_b) from people_with_second_Source;
+SELECT avg(networth_b) FROM people_with_second_Source;
 
-select avg(networth_b) from richest_people; 
+SELECT avg(networth_b) FROM richest_people; 
 
 
 
 
 -- show avg wealth of billionaires from each country 
 
-select avg(networth_b), country 
-from richest_people
-group by country 
-order by avg(networth_b) desc; 
+SELECT avg(networth_b), country 
+FROM richest_people
+GROUP BY country 
+ORDER BY avg(networth_b) DESC; 
 
 -- show countries with the most billionaries around the world
-select count(*) as count, country 
-from richest_people 
-group by country
-order by count desc; 
+SELECT COUNT(*) AS COUNT, country 
+FROM richest_people 
+GROUP BY country
+ORDER BY COUNT DESC; 
 
 -- show industries with the most billionaires
-select count(*) as count, industry 
-from richest_people
-group by industry
-order by count desc; 
+SELECT COUNT(*) AS COUNT, industry 
+FROM richest_people
+GROUP BY industry
+ORDER BY COUNT DESC; 
 
 -- show top 10 industries with the most billionaires
-select count(*) as count, industry 
-from richest_people
-group by industry
-order by count desc
-limit 10; 
+SELECT COUNT(*) AS COUNT, industry 
+FROM richest_people
+GROUP BY industry
+ORDER BY COUNT DESC
+LIMIT 10; 
 
 -- show top 10 industries with the least billionaires
-select count(*) as count, industry 
-from richest_people
-group by industry
-order by count 
-limit 10; 
+SELECT COUNT(*) AS COUNT, industry 
+FROM richest_people
+GROUP BY industry
+ORDER BY COUNT
+LIMIT 10; 
 
 
 -- show industries with the highest average networth
-select avg(networth_b) as networth, industry
-from richest_people 
-group by industry
-order by networth desc
-limit 15;
+SELECT avg(networth_b) AS networth, industry
+FROM richest_people 
+GROUP BY industry
+ORDER BY networth DESC
+LIMIT 15;
 
 
 
