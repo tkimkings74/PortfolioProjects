@@ -1,6 +1,6 @@
-use housing; 
+USE housing; 
 
-create table housing_data (
+CREATE TABLE housing_data (
 	UniqueID int,
     ParcelID varchar(30), 
     LandUSe varchar(30), 
@@ -29,105 +29,105 @@ ENCLOSED BY '"' LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
 
-select * from housing_data;
+SELECT * FROM housing_data;
 
 
 -- replace empty records with null value 
-update housing_data 
-set OwnerName = null 
-where OwnerName = '';
+UPDATE housing_data 
+SET OwnerName = null 
+WHERE OwnerName = '';
 
 
 
-update housing_data 
-set TaxDistrict = null 
-where TaxDistrict = '';
+UPDATE housing_data 
+SET TaxDistrict = null 
+WHERE TaxDistrict = '';
 
 
 
 
 -- finds records where null property addresses exist by using self join
-select  a.uniqueID, a.parcelID, a.PropertyAddress, b.uniqueID, b.parcelID, b.PropertyAddress
-from housing_data as a
-join housing_data as b 
-on a.parcelID = b.parcelID 
-and a.uniqueID != b.uniqueID
-where a.PropertyAddress is null;
+SELECT  a.uniqueID, a.parcelID, a.PropertyAddress, b.uniqueID, b.parcelID, b.PropertyAddress
+FROM housing_data AS a
+JOIN housing_data S b 
+ON a.parcelID = b.parcelID 
+AND a.uniqueID != b.uniqueID
+WHERE a.PropertyAddress IS null;
 
 -- updates null values in property address with address in records with the same parcelID
-update housing_data as a
-join housing_data as b 
-on a.parcelID = b.parcelID 
-and a.uniqueID != b.uniqueID
-set a.propertyaddress = b.propertyaddress
-where a.PropertyAddress is null;
+UPDATE housing_data AS a
+JOIN housing_data AS b 
+ON a.parcelID = b.parcelID 
+AND a.uniqueID != b.uniqueID
+SET a.propertyaddress = b.propertyaddress
+WHERE a.PropertyAddress IS null;
 
 -- breaking property address into 3 columns: address, city, state
 -- position function finds index value of input, substring uses those values to cut string into substrings
-select substring(propertyaddress, 1, position(',' in propertyaddress) - 1) 
-as address,
- substring(propertyaddress, position(',' in propertyaddress) + 1, length(propertyaddress))
-as city
-from housing_data;
+SELECT substring(propertyaddress, 1, position(',' IN propertyaddress) - 1) 
+AS address,
+ substring(propertyaddress, position(',' IN propertyaddress) + 1, length(propertyaddress))
+AS city
+FROM housing_data;
 
 
 
-alter table housing_data 
-add address_cut varchar(50); 
+ALTER TABLE housing_data 
+ADD address_cut varchar(50); 
 
-alter table housing_data
-add address_city varchar(50); 
+ALTER TABLE housing_data
+ADD address_city varchar(50); 
 
-update housing_data 
-set address_cut = substring(propertyaddress, 1, position(',' in propertyaddress) - 1) ;
+UPDATE housing_data 
+SET address_cut = substring(propertyaddress, 1, position(',' IN propertyaddress) - 1) ;
 
-update housing_data 
-set address_city = substring(propertyaddress, position(',' in propertyaddress) +1, length(propertyaddress));
+UPDATE housing_data 
+SET address_city = substring(propertyaddress, position(',' IN propertyaddress) +1, length(propertyaddress));
 
 
 -- split up owner address into address, city, and state
 
 -- split up state in address
-select substring_index(owneraddress, ',', -1 ) from housing_data;
+SELECT substring_index(owneraddress, ',', -1 ) FROM housing_data;
 
 -- split up owner's address
-select substring_index(owneraddress, ',', 1 ) from housing_data;
+SELECT substring_index(owneraddress, ',', 1 ) FROM housing_data;
 
 -- split up owner's city 
-select substring_index(substring_index(owneraddress, ',', 2 ) , ',', -1) from housing_data; 
+SELECT substring_index(substring_index(owneraddress, ',', 2 ) , ',', -1) FROM housing_data; 
 
-alter table housing_data 
-add owner_address varchar(50); 
+ALTER TABLE housing_data 
+ADD owner_address varchar(50); 
 
-alter table housing_data 
-add owner_city varchar(50); 
+ALTER TABLE housing_data 
+ADD owner_city varchar(50); 
 
-alter table housing_data
-add owner_state varchar(5); 
+ALTER TABLE housing_data
+ADD owner_state varchar(5); 
 
-update housing_data 
-set owner_address = substring_index(owneraddress, ',', 1 ); 
+UPDATE housing_data 
+SET owner_address = substring_index(owneraddress, ',', 1 ); 
 
-update housing_data
-set owner_city = substring_index(substring_index(owneraddress, ',', 2 ) , ',', -1); 
+UPDATE housing_data
+SET owner_city = substring_index(substring_index(owneraddress, ',', 2 ) , ',', -1); 
 
-update housing_data 
-set owner_state = substring_index(owneraddress, ',', -1); 
+UPDATE housing_data 
+SET owner_state = substring_index(owneraddress, ',', -1); 
 
 -- update y and n values to yes and no in soldasvacant field 
 
-update housing_data 
-set soldasvacant = 'yes' 
-where soldasvacant = 'y'; 
+UPDATE housing_data 
+SET soldasvacant = 'yes' 
+WHERE soldasvacant = 'y'; 
 
-update housing_data 
-set soldasvacant = 'no' 
-where soldasvacant = 'n'; 
+UPDATE housing_data 
+SET soldasvacant = 'no' 
+WHERE soldasvacant = 'n'; 
 
 -- alternatively
 
-update housing_data
-set soldasvacant = 
+UPDATE housing_data
+SET soldasvacant = 
 case 
 	when soldasvacant = 'y' then 'yes'
 	when soldasvacant = 'n' then 'no'
@@ -139,24 +139,24 @@ case
 
 -- remove duplicates
 with rowNumCTE 
-as ( 
-	select *, row_number() over (
-	partition by 
+AS ( 
+	SELECT *, row_number() over (
+	partition BY 
 		parcelID, 
         -- propertyaddress, 
         saledate, 
         legalreference 
-	order by 
+	ORDER BY 
 		uniqueid
 	) row_num
-from housing_data 
+FROM housing_data 
 
 )
-delete from h
-using housing_data as h 
-join rownumcte as r 
-on h.parcelid = r.parcelid
-where r.row_num > 1; 
+DELETE FROM h
+using housing_data AS h 
+JOIN rownumcte S r 
+ON h.parcelid = r.parcelid
+WHERE r.row_num > 1; 
 
 
 
@@ -164,16 +164,16 @@ where r.row_num > 1;
 
 -- removed columns that aren't needed
 
-alter table housing_data 
-drop column owneraddress;
+ALTER TABLE housing_data 
+DROP column owneraddress;
 
- alter table housing_data 
- drop column TaxDistrict; 
+ALTER TABLE housing_data 
+DROP column TaxDistrict; 
  
- alter table housing_data 
- drop column PropertyAddress; 
+ALTER TABLE housing_data 
+DROP column PropertyAddress; 
  
 
-select * from housing_data; 
+SELECT * FROM housing_data; 
 
 
