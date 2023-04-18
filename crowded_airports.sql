@@ -1,6 +1,6 @@
-set sql_safe_updates = 0; 
+SET sql_safe_updates = 0; 
 
-create database crowded_airports;
+CREATE database crowded_airports;
 
 use crowded_airports;
 
